@@ -9,7 +9,6 @@ $Data::Dumper::Sortkeys = sub { [reverse sort keys %{$_[0]}] };
 
 use Mojolicious::Lite;
 use Mojo::JSON qw(decode_json encode_json);
-use Mojolicious::Command::deploy::heroku;
 #app->config(hypnotoad => {listen => ['http://*:8090']});
 
 
