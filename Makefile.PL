@@ -5,6 +5,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
   VERSION   => '0.01',
-  PREREQ_PM => {'Mojolicious' => '7.10'},
+  PREREQ_PM => {'Mojolicious' => '7.11',
+		'Mojo::Pg' => '2.30'},
   test      => {TESTS => 't/*.t'}
 );
