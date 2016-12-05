@@ -1,2 +1,2 @@
 #!/bin/sh
-./mp_clock daemon --listen http://*:$PORT --mode production
+./mp_clock.pl daemon --listen http://*:$PORT --mode production
