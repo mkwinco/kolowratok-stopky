@@ -158,7 +158,7 @@ function loadgame(gameid) {
 		},
 	});
 	
-};4
+};
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 var players = {'ingame':[],'available':[]};
@@ -370,7 +370,7 @@ function send_status_to_db(updated,what){
 	if (typeof g === 'undefined') return;
 	
 	// the new victory points should be updated ONLY when next is pressed
-	var add = null;
+	var add = 0;
 	if (what === 'full') {
 		add = jQuery('#vpselector0'+updated+'>option:selected').val()
 	}

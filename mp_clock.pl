@@ -11,10 +11,21 @@ use Mojolicious::Lite;
 use Mojo::JSON qw(decode_json encode_json);
 #app->config(hypnotoad => {listen => ['http://*:8090']});
 
+say Dumper(\%ENV);
 
 use Mojo::Pg;
+# now we need to use $DATABASE_URL in heroku
+my $pg_conn = qq();
+if (! defined $ENV{'DATABASE_URL'}) {
+	# if there is no such variable then run locally
+	$pg_conn = 'postgresql://postgres:postgres@localhost/kolovratok';
+} else {
+	# use the variable
+	$pg_conn = $ENV{'DATABASE_URL'};
+};
+
 # protocol://user:pass@host/database
-my $pg = Mojo::Pg->new('postgresql://postgres:postgres@localhost/kolovratok');
+my $pg = Mojo::Pg->new($pg_conn);
 
 ############ loadgamenames ##############
 get '/loadgamenames' => sub  {
@@ -86,6 +97,7 @@ post '/addgame' => sub  {
 post '/updategame' => sub  {
 	my $c = shift;
 	
+	#say Dumper($c->req->params->to_hash);
 	my $select = $pg->db->query(qq(SELECT * FROM testuser1.new_turn(?,?,?,?,?)),$c->param('player[player_name]'),$c->param('player[time_balance]'),$c->param('add'),$c->param('turn'),$c->param('gamename'));
 	
 	$select = $pg->db->query(qq(SELECT testuser1.actual_status(?);),$c->param('gameid'));
