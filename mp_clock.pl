@@ -23,6 +23,8 @@ if (! defined $ENV{'DATABASE_URL'}) {
 	# use the variable
 	$pg_conn = $ENV{'DATABASE_URL'};
 };
+# however, protocol for Mojo::Pg is postgresql, not postgres
+$pg_conn =~ s/^postgres:/postgresql:/;
 
 # protocol://user:pass@host/database
 my $pg = Mojo::Pg->new($pg_conn);
