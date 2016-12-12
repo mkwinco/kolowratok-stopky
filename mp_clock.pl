@@ -41,7 +41,7 @@ plugin 'authentication', {
 		
 		my $authDB = $pg->db->query(qq(SELECT * FROM general.authenticate(?,?,?);),$un,$pw,'')->hash;
 		
-		say Dumper($authDB);
+		#say Dumper($authDB);
 
 		# if there is authenticated user and the username equals the incoming value then return it
 		if (defined $authDB->{'authenticate'}) {
@@ -62,7 +62,7 @@ post '/login_test' => sub {
 };
 
 
-get '/login/:info' => [info => [qw/ denied login /]] => sub {
+get '/login' =>  sub {
 	my $c = shift;
 	
 	$c->logout();
@@ -93,7 +93,7 @@ under sub {
 	
 	return 1 if ($c->is_user_authenticated());
 	
-	$c->redirect_to('login/denied');
+	$c->redirect_to('login');
 	return;
 };
 
@@ -208,7 +208,7 @@ __DATA__
 % end
 
 %= t div => (id=>"user") => "Logged in user: ".$user
-%= input_tag 'logout', id=>'logout', type => 'button', value => 'logout', onclick=>"location.href= '/login/login';"
+%= input_tag 'logout', id=>'logout', type => 'button', value => 'logout', onclick=>"location.href= '/login';"
 <br>
 %= input_tag 'newgamebutton', id=>'newgamebutton', type => 'button', value => 'newgame', onclick => 'newgame()'
 
@@ -227,7 +227,6 @@ __DATA__
 
 
 %= t h1 => 'Multiplayer clock login'
-%== $info
 %= form_for '/login_test' => (method => 'post') => begin
 	<table>
 		<tr> <td>Username: </td> <td> <%= text_field 'username' %> </td> </tr>
@@ -249,7 +248,7 @@ __DATA__
 	</table>
 	%= submit_button 'Create new user'
 %= end
-<a href="<%= url_for 'login/login' %>">Log in existing user</a>
+<a href="<%= url_for 'login' %>">Log in existing user</a>
 
 @@ layouts/default.html.ep
 <!DOCTYPE html>
