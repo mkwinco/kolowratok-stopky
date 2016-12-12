@@ -133,6 +133,7 @@ function startgame() {
 	} else if (g.turn==0) {
 		jQuery('<input/>').attr({ type: 'button', id:'startbutton', value:'►', onclick:"create_next_button();next_timer()"}).appendTo( jQuery("#Container") );
 	};
+	jQuery('#startbutton').css({"width":"100px","height":"70px"});
 };
 
 function loadgame(gameid) {
@@ -291,7 +292,7 @@ function update() {
 
 function create_next_button() {
 	// create next button4
-	jQuery('<input/>').attr({ type: 'button', name:'next', value:'next', onclick:"javascript: next_timer()"}).appendTo( jQuery("#Container") );
+	jQuery('<input/>').attr({ type: 'button', name:'next', value:'next', onclick:"javascript: next_timer()"}).css({"width":"100px","height":"70px"}).appendTo( jQuery("#Container") );
 // actually, next should be available anywhere in player container area
 	//jQuery("#container_players").attr('onclick', "javascript: next_timer()");
 // well no, when selecting score, it's not doing any good
