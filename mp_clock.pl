@@ -114,7 +114,7 @@ get '/loadgamenames' => sub  {
 get '/loadgame' => sub  {
 	my $c = shift;
 	
-	my $select = $pg->db->query(qq(SET search_path TO ?; SELECT actual_status(?);),$c->current_user(),$c->param('gameid'));
+	my $select = $pg->db->query(qq(SELECT general.actual_status(?,?);),$c->current_user(),$c->param('gameid'));
 	my $collection = $select->arrays;
 
 	my $game = decode_json $collection->to_array->[0]->[0];
@@ -140,7 +140,7 @@ get '/loadplayers' => sub  {
 post '/addplayer' => sub  {
 	my $c = shift;
 	
-	my $select = $pg->db->query(qq(SET search_path TO ?; SELECT * FROM addplayer(?)),$c->current_user(),$c->param('NewPlayerName'));
+	my $select = $pg->db->query(qq(SELECT general.addplayer(?,?)),$c->current_user(),$c->param('NewPlayerName'));
 	# the DB function is returning just a plain number (0 or 1). It is easiest to pick it up via method "arrays" and translate to real array of arrays via "to_array"
 	$c->render(json => {playersadded => $select->arrays->to_array->[0]->[0] });
 };
@@ -157,7 +157,7 @@ post '/addgame' => sub  {
 	#say Dumper(\@arr);
 	#say Dumper($c->req->params->to_hash);
 	
-	my $select = $pg->db->query(qq(SET search_path TO ?; SELECT addgame(?,?,?,?);),$c->current_user(),$c->param('name'),$c->param('initialtime'),$c->param('extratime'),\@arr);
+	my $select = $pg->db->query(qq(SELECT general.addgame(?,?,?,?,?);),$c->current_user(),$c->param('name'),$c->param('initialtime'),$c->param('extratime'),\@arr);
 
 	# the DB function is returning just a plain number (0 or 1). It is easiest to pick it up via method "arrays" and translate to real array of arrays via "to_array"
 	$c->render(json => {returncode => $select->arrays->to_array->[0]->[0] });
@@ -169,9 +169,9 @@ post '/updategame' => sub  {
 	my $c = shift;
 	
 	#say Dumper($c->req->params->to_hash);
-	my $select = $pg->db->query(qq(SET search_path TO ?; SELECT * FROM new_turn(?,?,?,?,?)),$c->current_user(),$c->param('player[player_name]'),$c->param('player[time_balance]'),$c->param('add'),$c->param('turn'),$c->param('gamename'));
+	my $select = $pg->db->query(qq(SELECT * FROM general.new_turn(?,?,?,?,?,?)),$c->current_user(),$c->param('player[player_name]'),$c->param('player[time_balance]'),$c->param('add'),$c->param('turn'),$c->param('gamename'));
 	
-	$select = $pg->db->query(qq(SET search_path TO ?;SELECT actual_status(?);),$c->current_user(),$c->param('gameid'));
+	$select = $pg->db->query(qq(SELECT general.actual_status(?,?);),$c->current_user(),$c->param('gameid'));
 	my $collection = $select->arrays;
 
 	my $game = decode_json $collection->to_array->[0]->[0];
