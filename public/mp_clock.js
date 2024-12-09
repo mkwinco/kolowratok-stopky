@@ -12,8 +12,8 @@ function formatTime(time) {
 		style = "<span style='color:yellow; text-decoration: blink;'> - ";
 		time = -time;
 	};
-		
-	
+
+
 	h = Math.floor( time / (60 * 60 * 1000) );
 	time = time % (60 * 60 * 1000);
 	m = Math.floor( time / (60 * 1000) );
@@ -27,8 +27,8 @@ function formatTime(time) {
 }
 
 var now	= function() {
-	return (new Date()).getTime(); 
-}; 
+	return (new Date()).getTime();
+};
 
 
 function loadgamenames() {
@@ -74,10 +74,10 @@ function startgame() {
 
 // Clear any New-Game elements
 	jQuery('#ng').remove();
-	
+
 // switch create game button back to new game button
 	jQuery("#newgamebutton").attr({'value':"New Game", 'onclick':"javascript: newgame()"} );
-	
+
 // Clear the containers from any previous games
 	jQuery("#container_players,#Container").empty();
 
@@ -87,33 +87,33 @@ function startgame() {
 		.css({"width":"500px","font-family": "Open Sans"})
 		.append( jQuery("<tr />")
 			.append( jQuery("<th />").text("Player").css({"align":"left"} ) )
-			.append( jQuery("<th />").text("Time").css({"align":"center"} ) ) 
-			.append( jQuery("<th />").text("Add").css({"text-align":"left"} ) ) 
-			.append( jQuery("<th />").text("Spent").css({"text-align":"left"} ) ) 
-			.append( jQuery("<th />").text("Score").css({"text-align":"left"} ) ) 
+			.append( jQuery("<th />").text("Time").css({"align":"center"} ) )
+			.append( jQuery("<th />").text("Add").css({"text-align":"left"} ) )
+			.append( jQuery("<th />").text("Spent").css({"text-align":"left"} ) )
+			.append( jQuery("<th />").text("Score").css({"text-align":"left"} ) )
 		)
 		.appendTo( jQuery("#container_players") );
-	
+
 // Run through all players in game and prepare divs and spans for them
 	jQuery.each(g.status, function(i,v) {
-		
+
 		pt.append(
 			jQuery("<tr />").attr({'id':"row0"+i})
 			.append( jQuery("<td />").text((1+i)+" "+v.player_name).attr({'id':"playerid"+i}).css({"align":"left"}) )
 			.append( jQuery("<td />").html(formatTime(v.time_balance)).attr({'id':"time0"+i}).css({"align":"center"}) )
 			.append( jQuery("<td />").append( jQuery("<select />").attr({'id':"vpselector0"+i} ) ).css({"align":"center"}) )
-			.append( jQuery("<td />").text(v.spent).attr('id',"spent0"+i).css({"align":"center","fontWeight":"lighter"}) ) 
+			.append( jQuery("<td />").text(v.spent).attr('id',"spent0"+i).css({"align":"center","fontWeight":"lighter"}) )
 			.append( jQuery("<td />").text(v.score).attr('id',"score0"+i).css({"align":"center","fontWeight":"bold"}) )
-			
+
 		);
 		var s = jQuery("#vpselector0"+i);
-		jQuery.each([0,1,2,3,4,5,6,7,8,9], function(j,w) {s.append(jQuery('<option>',{value:j}).text(j))}); 
-	
-		
+		jQuery.each([0,1,4,9,16,25,36,49,64,81], function(j,w) {s.append(jQuery('<option>',{value:j}).text(w))});
+
+
 // use this loop to translate active as a name (g.active) into index (active)
 		if (g.active==v.player_name) {active=i};
 		console.log(active);
-		
+
 	});
 // however, if turn is 0, the first player is always active
 //	if (g.turn==0) {g.turn=1; active=0;}
@@ -124,7 +124,7 @@ function startgame() {
 	jQuery("<div />").html("TURN: " + g.turn).attr('id',"turntimer").appendTo( jQuery("#Container") );
 	jQuery("<div />").html("Initial time: " + g.initialtime + "s<br> Extra time: " + g.extratime + "s (per turn)").appendTo( jQuery("#Container") );
 	jQuery("<div />").html("TURN TIME (" + g.status[active].player_name + "): " + formatTime(turntime)).attr('id',"turntime").appendTo( jQuery("#container_players") );
-	
+
 // Active was resolved above, we can write about it (and make it bold)
 	if (g.turn>0) {
 		jQuery("#playerid"+active).css('fontWeight','bold');
@@ -137,7 +137,7 @@ function startgame() {
 };
 
 function loadgame(gameid) {
-	
+
 // stop anything that was running before (but handle db writting)
 	stop_timer();
 	console.log("loadgame: " + gameid);
@@ -158,30 +158,30 @@ function loadgame(gameid) {
 			alert(" GAME cannot be loaded!");
 		},
 	});
-	
+
 };
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 var players = {'ingame':[],'available':[]};
 
 function newgame() {
-	
+
 // Clear the containers from any previous games
 	jQuery("#container_players,#Container").empty();
-	
+
 // switch new game button to create game button
 	jQuery("#newgamebutton").attr({'value':"Create Game", 'onclick':"javascript: creategame()"} );
-	
+
 // create new container where the new game is going to be created
 	jQuery('body').append(	jQuery('<div/>',{id:'ng'})	);
 // inside the container, there will be init time, extra time and player-selection table
 	jQuery('#ng').append("<hr><form id='timeform'>New game name: <input id='newgamename' type='text' value='New game name'><br>Initial Time [s]: <input id='inittime' type='number' min='0' step='1' value='0'><br>Extra Time [s]: <input id='extratime' type='number' min='0' step='1' value='120'></form><hr>");
-		
+
 	jQuery('#ng').append( jQuery('<table/>', {id:'pmt'}) ).append( jQuery('<tbody/>', {id:'pmtb'}) );
 // this is inside table (empty so far)
 	jQuery('<tr><td>In game</td><td/><td>Pick players</td></tr>').appendTo('#pmtb');
 	jQuery('<tr><td> <select id="ingame" class="inputselect" style="width: 280px;" multiple="multiple" size="10"></select> </td>  <td> <input id="addplayer" type="button" onclick="move_player(\'add\');" value=" « "> <br> <input id="delplayer" type="button" onclick="move_player(\'remove\');" value=" » "> </td>  <td>  <select id="available" class="inputselect" style="width: 280px;" multiple="multiple" size="10"></select>  <form name="APform" id="APform" action="javascript:void(0);" onsubmit="AddPlayer()"> <input type="text" name="NewPlayersName"> <input type="submit" value="AddPlayer"> </form></td></tr>').appendTo('#pmtb');
-	
+
 	// and now load all the players
 	jQuery.get(
 		"loadplayers",
@@ -199,8 +199,8 @@ function AddPlayer() {
 	//console.log(document.forms["APform"]["NewPlayersName"].value);
 	var NewPlayerName=jQuery("#APform")[0][0].value;
 	//console.log(NewPlayerName);
-	
-	
+
+
 	// send new player into DB and use him/her if added succesfully
 	jQuery.ajax({
 		'async': false,
@@ -234,11 +234,11 @@ function fillout_table() {
 // this function is bound to onclick property of the add/remove player buttons
 function move_player(movetype) {
 // on right click deselect: $('#mySelectList').val('');
-	
+
 	var from,to;
-	if (movetype == "add") {from = 'available'; to = 'ingame';} 
+	if (movetype == "add") {from = 'available'; to = 'ingame';}
 	else if (movetype == "remove") {from = 'ingame'; to = 'available';};
-	
+
 // players' name(s) that is/are currently selected [array]
 	jQuery('#'+from+' option:selected').each(function(i,v){
 		// are removed from that list
@@ -253,13 +253,13 @@ function move_player(movetype) {
 
 
 function creategame() {
-	
+
 	//console.dir(players);
 	if (jQuery.isEmptyObject(players.ingame)) {alert("Select some players first"); return;};
 	// now the whole info about new game is sent to db
 	var newgame = {name:document.forms["timeform"]["newgamename"].value,initialtime:document.forms["timeform"]["inittime"].value, extratime:document.forms["timeform"]["extratime"].value,players:JSON.stringify(players.ingame)}
 	console.dir(newgame);
-	
+
 	// send new game into DB
 	jQuery.ajax({
 //		'async': false,
@@ -275,7 +275,7 @@ function creategame() {
 		},
 		'error':  function (data,status) {alert("Something went wrong");},
 	});
-	
+
 };
 
 
@@ -283,7 +283,7 @@ function creategame() {
 
 
 function update() {
-	
+
 	var timepassed = now()-last_start;
 	//console.log(timepassed);
 	jQuery("#time0"+active).html(formatTime(g.status[active].time_balance - timepassed ) );
@@ -303,7 +303,7 @@ function start_timer() {
 
 //switch stop/pause
 	jQuery("#startbutton").attr({'value':"■", 'onclick':"javascript: stop_timer('timeonly')"} );
-	
+
 	clocktimer = setInterval("update()", frequency);
 	last_start = now();
 };
@@ -314,22 +314,22 @@ function stop_timer(what) {
 	if (last_start == 0) {
 		// well that is not true, next should always update DB
 		send_status_to_db(active,what);
-		return; 
+		return;
 	};
-	
+
 	clearInterval(clocktimer);
 
 //switch stop/pause
 	jQuery("#startbutton").attr({'value':"►", 'onclick':"javascript: start_timer()"} );
-	
+
 // the active- and turn- timers should be stopped here
 	var timepassed = now()-last_start;
-	g.status[active].time_balance = g.status[active].time_balance - timepassed; 
+	g.status[active].time_balance = g.status[active].time_balance - timepassed;
 	turntime = turntime + timepassed;
-	
-	
+
+
 	send_status_to_db(active,what);
-	
+
 	last_start = 0;
 };
 
@@ -337,30 +337,30 @@ function next_timer(){
 
 // stop timer for the old "active" (and do it before turn is raised by 1)
 	stop_timer('full');
-	
+
 	jQuery("#playerid"+active).css('fontWeight','normal');
 	jQuery("#row0"+active).css('background-color','lightblue');
 
-	var nextactive = active + 1; 
+	var nextactive = active + 1;
 	if (nextactive >= g.status.length) {nextactive=0; g.turn++};
-	
+
 	jQuery("#turntimer").html("TURN: " + g.turn);
 
 // pass active to the next
 	active = nextactive;
 // extend actual time for extratime (as each turn)
-	
+
 //	console.dir(g.status[active]);
 //	console.log(g.extratime);
 	g.status[active].time_balance = g.status[active].time_balance + g.extratime * 1000;
 //	console.dir(g.status[active]);
 
-	
+
 	turntime = 0;
 
 	jQuery("#playerid"+active).css('fontWeight','bold');
 	jQuery("#row0"+active).css('background-color','orange');
-// start time for new active	
+// start time for new active
 	start_timer()
 };
 
@@ -369,7 +369,7 @@ function next_timer(){
 function send_status_to_db(updated,what){
 // if g is undefined then no game has yet been loaded
 	if (typeof g === 'undefined') return;
-	
+
 	// the new victory points should be updated ONLY when next is pressed
 	var add = 0;
 	if (what === 'full') {
@@ -380,7 +380,7 @@ function send_status_to_db(updated,what){
 	};
 
 	console.log(add);
-	
+
 // update the database
 	jQuery.post(
 		"updategame",
@@ -397,5 +397,5 @@ function send_status_to_db(updated,what){
 		},
 		"json"
 	);
-	
+
 };

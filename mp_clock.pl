@@ -18,7 +18,7 @@ use Mojo::Pg;
 my $pg_conn = qq();
 if (! defined $ENV{'DATABASE_URL'}) {
 	# if there is no such variable then run locally
-	$pg_conn = 'postgresql://postgres:postgres@localhost/kolovratok';
+	$pg_conn = 'postgresql://postgres:postgres@localhost/kolowratok-stopky';
 } else {
 	# use the variable
 	$pg_conn = $ENV{'DATABASE_URL'};
@@ -38,9 +38,9 @@ plugin 'authentication', {
 	},
 	validate_user => sub {
 		my ($c,$un,$pw,$extra) = @_;
-		
+
 		my $authDB = $pg->db->query(qq(SELECT * FROM general.authenticate(?,?,?);),$un,$pw,'')->hash;
-		
+
 		#say Dumper($authDB);
 
 		# if there is authenticated user and the username equals the incoming value then return it
@@ -55,7 +55,7 @@ plugin 'authentication', {
 ############## LOGIN ##################
 post '/login_test' => sub {
 	my $c = shift;
-	
+
 	my $u=$c->authenticate($c->req->param('username'),$c->req->param('password'),{auth_key=>''});
 	$c->redirect_to('/');
 
@@ -64,18 +64,18 @@ post '/login_test' => sub {
 
 get '/login' =>  sub {
 	my $c = shift;
-	
+
 	$c->logout();
 	$c->render('login');
-  
+
 };
 
 
 post '/adduser' => sub {
 	my $c = shift;
-	
+
 	my $create = $pg->db->query(qq(SELECT general.add_user(?,general.hashme(?),?);), $c->req->param('username'),$c->req->param('password') ,'' )->hash;
-	
+
 	my $u=$c->authenticate($c->req->param('username'),$c->req->param('password'),{auth_key=>''});
 	$c->redirect_to('/');
 
@@ -85,14 +85,14 @@ get '/createuser' => sub {
 	my $c = shift;
 
 	$c->render('createuser');
-  
+
 };
 ####################### UNDER (NOT AUTENTICATED) ########################
 under sub {
 	my $c = shift;
-	
+
 	return 1 if ($c->is_user_authenticated());
-	
+
 	$c->redirect_to('login');
 	return;
 };
@@ -103,43 +103,43 @@ get '/loadgamenames' => sub  {
 	my $c = shift;
 
 	my $select = $pg->db->query(qq(SET search_path TO ?; SELECT g_id,name,to_char(game_last_updated_at, 'Dy, DD-Mon-YYYY HH24:MI:SS') last_save FROM game;),$c->current_user());
-	
+
 	my @out = ();
 	while (my $next = $select->hash) {push(@out,$next);};
-	
+
 	$c->render(json => {games => \@out});
 };
 
 ############ loadgame ##############
 get '/loadgame' => sub  {
 	my $c = shift;
-	
+
 	my $select = $pg->db->query(qq(SELECT general.actual_status(?,?);),$c->current_user(),$c->param('gameid'));
 	my $collection = $select->arrays;
 
 	my $game = decode_json $collection->to_array->[0]->[0];
 #	say Dumper($game);
-	
+
 	$c->render(json => {game => $game });
 };
 
 ############ loadplayers ##############
 get '/loadplayers' => sub  {
 	my $c = shift;
-	
+
 	my $select = $pg->db->query(qq(SET search_path TO ?; SELECT name FROM player;),$c->current_user());
 
 	my @out = ();
 	while (my $next = $select->array) {push(@out,$next->[0])};
 	#say Dumper(\@out);
-	
+
 	$c->render(json => {available => \@out });
 };
 
 ############ addplayer ##############
 post '/addplayer' => sub  {
 	my $c = shift;
-	
+
 	my $select = $pg->db->query(qq(SELECT general.addplayer(?,?)),$c->current_user(),$c->param('NewPlayerName'));
 	# the DB function is returning just a plain number (0 or 1). It is easiest to pick it up via method "arrays" and translate to real array of arrays via "to_array"
 	$c->render(json => {playersadded => $select->arrays->to_array->[0]->[0] });
@@ -149,14 +149,14 @@ post '/addplayer' => sub  {
 ############ addgame ##############
 post '/addgame' => sub  {
 	my $c = shift;
-	
+
 	# clean up incomming array and turn it into perl array
 	my $aux = $c->param('players');
 	$aux =~ s/^\s*\[|\"|\]\s*$//g;
 	my @arr = split(/,/, $aux);
 	#say Dumper(\@arr);
 	#say Dumper($c->req->params->to_hash);
-	
+
 	my $select = $pg->db->query(qq(SELECT general.addgame(?,?,?,?,?);),$c->current_user(),$c->param('name'),$c->param('initialtime'),$c->param('extratime'),\@arr);
 
 	# the DB function is returning just a plain number (0 or 1). It is easiest to pick it up via method "arrays" and translate to real array of arrays via "to_array"
@@ -167,16 +167,16 @@ post '/addgame' => sub  {
 ############ updategame ##############
 post '/updategame' => sub  {
 	my $c = shift;
-	
+
 	#say Dumper($c->req->params->to_hash);
 	my $select = $pg->db->query(qq(SELECT * FROM general.new_turn(?,?,?,?,?,?)),$c->current_user(),$c->param('player[player_name]'),$c->param('player[time_balance]'),$c->param('add'),$c->param('turn'),$c->param('gamename'));
-	
+
 	$select = $pg->db->query(qq(SELECT general.actual_status(?,?);),$c->current_user(),$c->param('gameid'));
 	my $collection = $select->arrays;
 
 	my $game = decode_json $collection->to_array->[0]->[0];
 #	say Dumper($game);
-	
+
 	$c->render(json => {game => $game });
 };
 
@@ -203,7 +203,7 @@ __DATA__
 
 % content;
 
-%= javascript begin 
+%= javascript begin
 	start()
 % end
 
